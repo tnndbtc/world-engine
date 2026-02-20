@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0.0",
+  "script_id": "example_script_001",
+  "episode_id": "ep_001",
+  "title": "The Crossing",
+  "created_at": "2026-02-19T00:00:00Z",
+  "scenes": [
+    {
+      "scene_id": "s001",
+      "location": "Castle Entrance",
+      "time_of_day": "DAY",
+      "characters": ["char_lena"],
+      "dialogue": [],
+      "actions": [
+        {
+          "description": "Lena approaches the castle gate, hand resting on her sword hilt.",
+          "characters": ["char_lena"]
+        }
+      ],
+      "emotional_tags": ["anticipation"]
+    },
+    {
+      "scene_id": "s002",
+      "location": "Throne Room",
+      "time_of_day": "INTERIOR",
+      "characters": ["char_lena", "char_king"],
+      "dialogue": [
+        {
+          "speaker_id": "char_lena",
+          "text": "I have come to seek your counsel, my lord.",
+          "emotion": "respectful"
+        },
+        {
+          "speaker_id": "char_king",
+          "text": "State your purpose.",
+          "emotion": "stern"
+        }
+      ],
+      "actions": [],
+      "emotional_tags": ["tension"]
+    },
+    {
+      "scene_id": "s003",
+      "location": "Castle Courtyard",
+      "time_of_day": "DUSK",
+      "characters": ["char_lena"],
+      "dialogue": [
+        {
+          "speaker_id": "char_lena",
+          "text": "There is no turning back now.",
+          "emotion": "determined"
+        }
+      ],
+      "actions": [
+        {
+          "description": "Lena draws her sword, eyes fixed on the horizon.",
+          "characters": ["char_lena"]
+        }
+      ],
+      "emotional_tags": ["resolve"]
+    }
+  ],
+  "metadata": {}
+}
