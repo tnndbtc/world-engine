@@ -1,0 +1,11 @@
+{
+  "decision": "allow",
+  "producer": {
+    "component": "CanonGate",
+    "repo": "world-engine"
+  },
+  "reasons": [],
+  "schema_id": "CanonDecision",
+  "schema_version": "0.0.1",
+  "timing_lock_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

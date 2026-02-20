@@ -1,0 +1,13 @@
+{
+  "decision": "deny",
+  "producer": {
+    "component": "CanonGate",
+    "repo": "world-engine"
+  },
+  "reasons": [
+    "FORBIDDEN_TOKEN"
+  ],
+  "schema_id": "CanonDecision",
+  "schema_version": "0.0.1",
+  "timing_lock_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

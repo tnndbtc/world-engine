@@ -23,7 +23,7 @@ where = ["."]
 include = ["world_engine*"]
 
 [tool.pytest.ini_options]
-testpaths = ["world_engine/tests", "canon/tests"]
+testpaths = ["world_engine/tests", "canon/tests", "tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
