@@ -9,12 +9,14 @@ Covers:
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import types
 
 import pytest
 
 from world_engine.adaptation.models import AudioIntent, Shot, ShotList
-from canon.decision import CanonDecision, evaluate_shotlist
+from canon.decision import CanonDecision, dump_decision, evaluate_shotlist
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -261,3 +263,85 @@ class TestCanonDecisionTokenBoundary:
         )
         result = evaluate_shotlist(sl)
         assert result.decision == "allow"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Wave-2 determinism helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _allow_shotlist_wave2() -> ShotList:
+    """Clean ShotList — no FORBIDDEN tokens of any form."""
+    return ShotList(
+        shotlist_id="sl_wave2d_allow",
+        script_id="wave2_d_allow",
+        shots=[
+            Shot(
+                shot_id="allow_s001_shot_001",
+                scene_id="allow_s001",
+                duration_sec=3.0,
+                camera_framing="WIDE",
+                camera_movement="STATIC",
+                audio_intent=AudioIntent(),
+            )
+        ],
+        total_duration_sec=3.0,
+        timing_lock_hash="a" * 64,
+        created_at="1970-01-01T00:00:00Z",
+    )
+
+
+def _deny_shotlist_wave2() -> ShotList:
+    """ShotList with __FORBIDDEN__ token in action_beat → deny + FORBIDDEN_TOKEN reason."""
+    return ShotList(
+        shotlist_id="sl_wave2d_deny",
+        script_id="wave2_d_deny",
+        shots=[
+            Shot(
+                shot_id="deny_s001_shot_001",
+                scene_id="deny_s001",
+                duration_sec=2.5,
+                camera_framing="WIDE",
+                camera_movement="PAN_LEFT",
+                action_beat="Mage performs __FORBIDDEN__ ritual",
+                audio_intent=AudioIntent(),
+            )
+        ],
+        total_duration_sec=2.5,
+        timing_lock_hash="b" * 64,
+        created_at="1970-01-01T00:00:00Z",
+    )
+
+
+# Wave-2 pinned hashes — computed via auto-repair loop on 2026-02-20
+_HASH_ALLOW_W2 = "2e02c0bfd3220a28115b06f3ef14de8e69c3933edc6df7e009e0a7c0141c8a8f"
+_HASH_DENY_W2 = "71037b8009a8f462ea4500ebc19d4cd3ecdb7780932bf7be837574697c02734c"
+
+
+class TestWave2CanonDecisionGoldenFixtures:
+    """Byte-identity + SHA-256 regression for Wave-2 CanonDecision golden fixtures."""
+
+    def test_allow_byte_identity_and_hash(self):
+        """Allow fixture: two runs produce byte-identical JSON; decision/reasons exact."""
+        sl = _allow_shotlist_wave2()
+        json_out_1 = dump_decision(evaluate_shotlist(sl))
+        json_out_2 = dump_decision(evaluate_shotlist(sl))
+        assert json_out_1 == json_out_2, "byte-identity failed for allow fixture"
+        decision = evaluate_shotlist(sl)
+        assert decision.decision == "allow"
+        assert decision.reasons == []
+        assert _sha256(json_out_1) == _HASH_ALLOW_W2
+
+    def test_deny_byte_identity_and_hash(self):
+        """Deny fixture: __FORBIDDEN__ → decision='deny', reasons==['FORBIDDEN_TOKEN'], byte-identical."""
+        sl = _deny_shotlist_wave2()
+        json_out_1 = dump_decision(evaluate_shotlist(sl))
+        json_out_2 = dump_decision(evaluate_shotlist(sl))
+        assert json_out_1 == json_out_2, "byte-identity failed for deny fixture"
+        decision = evaluate_shotlist(sl)
+        assert decision.decision == "deny"
+        assert decision.reasons == ["FORBIDDEN_TOKEN"]
+        assert _sha256(json_out_1) == _HASH_DENY_W2
