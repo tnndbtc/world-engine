@@ -245,6 +245,7 @@ class TestCanonDecisionTokenBoundary:
         sl = types.SimpleNamespace(
             shots=[shot],
             timing_lock_hash="c" * 64,
+            schema_id="ShotList", schema_version="0.0.1",
         )
         result = evaluate_shotlist(sl)
         assert result.decision == "deny"
@@ -260,6 +261,7 @@ class TestCanonDecisionTokenBoundary:
         sl = types.SimpleNamespace(
             shots=[shot],
             timing_lock_hash="d" * 64,
+            schema_id="ShotList", schema_version="0.0.1",
         )
         result = evaluate_shotlist(sl)
         assert result.decision == "allow"

@@ -79,6 +79,15 @@ def evaluate_shotlist(shotlist) -> CanonDecision:
       This path takes precedence; the double-underscore form is NOT matched by
       the word-boundary regex because '_' is a word character.
     """
+    # --- Wave-3 contract guards ---
+    tlh = getattr(shotlist, "timing_lock_hash", None)
+    if not tlh:
+        raise ValueError("ERROR: ShotList missing timing_lock_hash")
+    sid = getattr(shotlist, "schema_id", None)
+    sver = getattr(shotlist, "schema_version", None)
+    if not sid or not sver:
+        raise ValueError("ERROR: ShotList missing schema metadata")
+    # --- existing logic unchanged below ---
     verbose_reasons: List[str] = []
     double_forbidden_found: bool = False
     for shot in shotlist.shots:
