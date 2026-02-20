@@ -3,6 +3,7 @@
 from world_engine.adaptation.adapter import adapt_script
 from world_engine.adaptation.models import (
     AudioIntent,
+    CanonSnapshot,
     CharacterInShot,
     DialogueLine,
     Scene,
@@ -14,12 +15,13 @@ from world_engine.adaptation.models import (
 
 __all__ = [
     "adapt_script",
-    "Script",
-    "ShotList",
-    "Shot",
-    "Scene",
-    "DialogueLine",
-    "SceneAction",
-    "CharacterInShot",
     "AudioIntent",
+    "CanonSnapshot",
+    "CharacterInShot",
+    "DialogueLine",
+    "Scene",
+    "SceneAction",
+    "Script",
+    "Shot",
+    "ShotList",
 ]

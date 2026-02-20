@@ -28,6 +28,7 @@ from world_engine.adaptation.emotional_tagger import (
 )
 from world_engine.adaptation.models import (
     AudioIntent,
+    CanonSnapshot,
     CharacterInShot,
     Scene,
     Script,
@@ -50,15 +51,21 @@ _DEFAULT_CREATED_AT: str = "1970-01-01T00:00:00Z"
 def adapt_script(
     script: Script,
     created_at: str = _DEFAULT_CREATED_AT,
+    *,
+    canon_snapshot: Optional[CanonSnapshot] = None,  # noqa: F841 – plumbing only
 ) -> ShotList:
     """Convert a validated Script into a ShotList with timing_lock_hash.
 
     Args:
-        script:     A validated Script model (§5.5).
-        created_at: ISO 8601 datetime string stamped on the ShotList artifact.
-                    Defaults to "1970-01-01T00:00:00Z".  The adapter NEVER
-                    reads the system clock; callers that need a real timestamp
-                    must supply it explicitly.
+        script:         A validated Script model (§5.5).
+        created_at:     ISO 8601 datetime string stamped on the ShotList artifact.
+                        Defaults to "1970-01-01T00:00:00Z".  The adapter NEVER
+                        reads the system clock; callers that need a real timestamp
+                        must supply it explicitly.
+        canon_snapshot: Optional validated CanonSnapshot (Wave-6 plumbing).
+                        Accepted and validated by the caller but not used in any
+                        computation — ShotList output is byte-identical with or
+                        without it.
 
     Returns:
         A ShotList (§5.6) where every shot has duration_sec > 0 and the

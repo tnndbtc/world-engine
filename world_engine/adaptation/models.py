@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 # ── Script models ─────────────────────────────────────────────────────────────
@@ -132,3 +132,25 @@ class ShotList(BaseModel):
     timing_lock_hash: str
     created_at: str  # ISO 8601
     metadata: Dict[str, Any] = {}
+
+
+# ── CanonSnapshot (Wave-6 plumbing) ───────────────────────────────────────────
+
+
+class CanonSnapshot(BaseModel):
+    """Minimal validated structure for an optional canon state input (Wave-6 plumbing)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    schema_id: str        # must equal "CanonSnapshot"
+    schema_version: str
+    episode_id: str
+    canon_hash: str
+    entities: List[Any] = []
+
+    @field_validator("schema_id")
+    @classmethod
+    def _check_schema_id(cls, v: str) -> str:
+        if v != "CanonSnapshot":
+            raise ValueError("schema_id must be 'CanonSnapshot'")
+        return v
