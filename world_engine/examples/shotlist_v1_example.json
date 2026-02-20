@@ -1,0 +1,257 @@
+{
+  "created_at": "2026-02-19T00:00:00Z",
+  "episode_id": "ep_001",
+  "metadata": {},
+  "schema_version": "1.0.0",
+  "script_id": "example_script_001",
+  "shotlist_id": "sl_5b9a090ccc4cd274",
+  "shots": [
+    {
+      "action_beat": "Establishing shot of Castle Entrance.",
+      "audio_intent": {
+        "music_mood": "anticipation",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": "anticipation",
+      "environment_notes": "Castle Entrance, DAY",
+      "scene_id": "s001",
+      "shot_id": "s001_shot_000",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "Lena approaches the castle gate, hand resting on her sword hilt.",
+      "audio_intent": {
+        "music_mood": "anticipation",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "PAN_LEFT",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.5,
+      "emotional_tag": "anticipation",
+      "environment_notes": "Castle Entrance, DAY",
+      "scene_id": "s001",
+      "shot_id": "s001_shot_001",
+      "shot_template_id": "tpl_action"
+    },
+    {
+      "action_beat": "Establishing shot of Throne Room.",
+      "audio_intent": {
+        "music_mood": "tension",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        },
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": "tension",
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "s002",
+      "shot_id": "s002_shot_002",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "char_lena speaks.",
+      "audio_intent": {
+        "music_mood": "tension",
+        "sfx_tags": [],
+        "vo_speaker_id": "char_lena",
+        "vo_text": "I have come to seek your counsel, my lord."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 4.1,
+      "emotional_tag": "respectful",
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "s002",
+      "shot_id": "s002_shot_003",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Reaction shot.",
+      "audio_intent": {
+        "music_mood": "tension",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": "tension",
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "s002",
+      "shot_id": "s002_shot_004",
+      "shot_template_id": "tpl_reaction"
+    },
+    {
+      "action_beat": "char_king speaks.",
+      "audio_intent": {
+        "music_mood": "tension",
+        "sfx_tags": [],
+        "vo_speaker_id": "char_king",
+        "vo_text": "State your purpose."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": "stern",
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "s002",
+      "shot_id": "s002_shot_005",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Reaction shot.",
+      "audio_intent": {
+        "music_mood": "tension",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": "tension",
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "s002",
+      "shot_id": "s002_shot_006",
+      "shot_template_id": "tpl_reaction"
+    },
+    {
+      "action_beat": "Establishing shot of Castle Courtyard.",
+      "audio_intent": {
+        "music_mood": "resolve",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": "resolve",
+      "environment_notes": "Castle Courtyard, DUSK",
+      "scene_id": "s003",
+      "shot_id": "s003_shot_007",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "char_lena speaks.",
+      "audio_intent": {
+        "music_mood": "resolve",
+        "sfx_tags": [],
+        "vo_speaker_id": "char_lena",
+        "vo_text": "There is no turning back now."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.9,
+      "emotional_tag": "determined",
+      "environment_notes": "Castle Courtyard, DUSK",
+      "scene_id": "s003",
+      "shot_id": "s003_shot_008",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Lena draws her sword, eyes fixed on the horizon.",
+      "audio_intent": {
+        "music_mood": "resolve",
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "PAN_LEFT",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.5,
+      "emotional_tag": "resolve",
+      "environment_notes": "Castle Courtyard, DUSK",
+      "scene_id": "s003",
+      "shot_id": "s003_shot_009",
+      "shot_template_id": "tpl_action"
+    }
+  ],
+  "timing_lock_hash": "9d79bacbafd89a6e2b0ea4227d7837a115d068e94d5b62a131053fa709760cde",
+  "total_duration_sec": 27.0
+}
