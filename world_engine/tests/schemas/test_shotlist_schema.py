@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import jsonschema
 import pytest
 from pydantic import ValidationError
 
@@ -12,6 +13,7 @@ from world_engine.schemas.shotlist_v1 import dump_shotlist, load_shotlist, valid
 
 EXAMPLES_DIR = Path(__file__).parent.parent.parent / "examples"
 SHOTLIST_EXAMPLE = EXAMPLES_DIR / "shotlist_v1_example.json"
+SCHEMA_FILE = Path(__file__).parent.parent.parent / "schemas" / "shotlist.schema.json"
 
 
 def _minimal_shotlist() -> ShotList:
@@ -120,3 +122,32 @@ class TestValidateShotlist:
     def test_example_file_validates_cleanly(self):
         data = json.loads(SHOTLIST_EXAMPLE.read_text(encoding="utf-8"))
         assert validate_shotlist(data) == []
+
+
+class TestJsonSchemaContract:
+    def _schema(self) -> dict:
+        return json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
+
+    @pytest.mark.skipif(
+        not SHOTLIST_EXAMPLE.exists(),
+        reason="shotlist_v1_example.json not generated yet",
+    )
+    def test_example_json_validates_against_schema(self):
+        """Golden example must pass the JSON Schema contract."""
+        jsonschema.validate(
+            json.loads(SHOTLIST_EXAMPLE.read_text(encoding="utf-8")),
+            self._schema(),
+        )
+
+    def test_missing_required_fields_rejected(self):
+        """Dict missing required root fields must fail JSON Schema validation."""
+        bad = {"script_id": "x", "shots": [], "total_duration_sec": 0.0}
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(bad, self._schema())
+
+    def test_extra_root_field_rejected(self):
+        """additionalProperties:false must reject unknown top-level keys."""
+        data = json.loads(_minimal_shotlist().model_dump_json())
+        data["unknown_v3_field"] = "should_be_rejected"
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(data, self._schema())
