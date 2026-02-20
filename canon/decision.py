@@ -96,10 +96,25 @@ def _shot_texts(shot) -> List[str]:
     return texts
 
 
-def evaluate_shotlist(shotlist) -> CanonDecision:
+def _dead_char_ids(snapshot: dict) -> frozenset:
+    """Return frozenset of character IDs whose alive fact is 'false' in *snapshot*."""
+    dead: set = set()
+    for entity in snapshot.get("entities", []):
+        if entity.get("type") != "character":
+            continue
+        char_id = entity.get("id")
+        if not char_id:
+            continue
+        for fact in entity.get("facts", []):
+            if fact.get("k") == "alive" and fact.get("v") == "false":
+                dead.add(char_id)
+    return frozenset(dead)
+
+
+def evaluate_shotlist(shotlist, snapshot=None) -> CanonDecision:
     """Evaluate *shotlist* and return a CanonDecision artifact.
 
-    Rules (Wave-2):
+    Rules (Wave-2 / Wave-5):
     - Default decision: "allow"
     - If any shot text contains the literal token "FORBIDDEN" (word-boundary),
       decision → "deny" with verbose reason strings (Wave-1 behaviour, unchanged).
@@ -107,6 +122,10 @@ def evaluate_shotlist(shotlist) -> CanonDecision:
       decision → "deny" with reasons == ["FORBIDDEN_TOKEN"] exactly (Wave-2).
       This path takes precedence; the double-underscore form is NOT matched by
       the word-boundary regex because '_' is a word character.
+    - (Wave-5) If *snapshot* is provided and a shot contains "APPEARS:<char_id>"
+      where <char_id> has alive=false in the snapshot, decision → "deny" with
+      reasons == ["CANON_CONTRADICTION"].  CANON_CONTRADICTION takes highest
+      precedence over all other deny reasons.
     """
     # --- Wave-3 contract guards ---
     tlh = getattr(shotlist, "timing_lock_hash", None)
@@ -116,11 +135,25 @@ def evaluate_shotlist(shotlist) -> CanonDecision:
     sver = getattr(shotlist, "schema_version", None)
     if not sid or not sver:
         raise ValueError("ERROR: ShotList missing schema metadata")
-    # --- existing logic unchanged below ---
+    # --- Wave-5: validate snapshot and build dead-char set ---
+    dead_chars: frozenset = frozenset()
+    if snapshot is not None:
+        if not isinstance(snapshot, dict) or "entities" not in snapshot:
+            raise ValueError("ERROR: invalid CanonSnapshot input")
+        dead_chars = _dead_char_ids(snapshot)
+    # --- existing logic + Wave-5 contradiction check ---
     verbose_reasons: List[str] = []
     double_forbidden_found: bool = False
+    canon_contradiction: bool = False
     for shot in shotlist.shots:
-        for text in _shot_texts(shot):
+        texts = _shot_texts(shot)
+        # Wave-5: APPEARS token against dead characters (highest priority deny)
+        if dead_chars:
+            for text in texts:
+                for char_id in dead_chars:
+                    if f"APPEARS:{char_id}" in text:
+                        canon_contradiction = True
+        for text in texts:
             if any(tok in text for tok in _POLICY_TOKENS):   # Wave-4: policy-file tokens
                 double_forbidden_found = True
             elif _FORBIDDEN_RE.search(text):
@@ -128,12 +161,31 @@ def evaluate_shotlist(shotlist) -> CanonDecision:
                 verbose_reasons.append(
                     f"shot {shot.shot_id!r} contains FORBIDDEN token: {snippet!r}"
                 )
-    reasons: List[str] = ["FORBIDDEN_TOKEN"] if double_forbidden_found else verbose_reasons
+    if canon_contradiction:
+        reasons: List[str] = ["CANON_CONTRADICTION"]
+    elif double_forbidden_found:
+        reasons = ["FORBIDDEN_TOKEN"]
+    else:
+        reasons = verbose_reasons
     return CanonDecision(
         timing_lock_hash=shotlist.timing_lock_hash,
         decision="deny" if reasons else "allow",
         reasons=reasons,
     )
+
+
+def assert_shotlist_canon(shotlist, snapshot=None) -> CanonDecision:
+    """Like evaluate_shotlist but raises ValueError on deny.
+
+    Raises:
+        ValueError: "ERROR: CanonGate denied: <reason>" where <reason> is the
+            first entry in decision.reasons (e.g. "CANON_CONTRADICTION").
+    """
+    decision = evaluate_shotlist(shotlist, snapshot=snapshot)
+    if decision.decision == "deny":
+        reason = decision.reasons[0] if decision.reasons else "DENIED"
+        raise ValueError(f"ERROR: CanonGate denied: {reason}")
+    return decision
 
 
 def dump_decision(decision: CanonDecision) -> str:
