@@ -53,3 +53,16 @@ def validate_script(data: dict) -> List[str]:
         return []
     except ValidationError as exc:
         return [f"{e['loc']}: {e['msg']}" for e in exc.errors()]
+
+
+def load_script_strict(source) -> Script:
+    """Load a Script; raise ValueError with deterministic message on any failure.
+
+    Raises:
+        ValueError("ERROR: invalid Script input") for ValidationError,
+        json.JSONDecodeError, FileNotFoundError, or TypeError (None input).
+    """
+    try:
+        return load_script(source)
+    except (ValidationError, json.JSONDecodeError, FileNotFoundError, TypeError):
+        raise ValueError("ERROR: invalid Script input")
