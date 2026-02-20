@@ -1,0 +1,94 @@
+{
+  "created_at": "1970-01-01T00:00:00Z",
+  "episode_id": null,
+  "metadata": {},
+  "producer": {
+    "component": "ShotListAdapter",
+    "repo": "world-engine"
+  },
+  "schema_id": "ShotList",
+  "schema_version": "0.0.1",
+  "script_id": "fixture_b",
+  "shotlist_id": "sl_6cfdb3f3cf8ed601",
+  "shots": [
+    {
+      "action_beat": "Establishing shot of Town Square.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_alice",
+          "expression": null,
+          "pose": null
+        },
+        {
+          "character_id": "char_bob",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": null,
+      "environment_notes": "Town Square, NOON",
+      "scene_id": "fb_s001",
+      "shot_id": "fb_s001_shot_000",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "char_alice speaks.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": "char_alice",
+        "vo_text": "Hello."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_alice",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Town Square, NOON",
+      "scene_id": "fb_s001",
+      "shot_id": "fb_s001_shot_001",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Reaction shot.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_bob",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Town Square, NOON",
+      "scene_id": "fb_s001",
+      "shot_id": "fb_s001_shot_002",
+      "shot_template_id": "tpl_reaction"
+    }
+  ],
+  "timing_lock_hash": "96a7655c4e9d2513dfd1a2df4bbc425dfafa9ba028d4a9b0d1b3830beaf7f6b7",
+  "total_duration_sec": 7.0
+}

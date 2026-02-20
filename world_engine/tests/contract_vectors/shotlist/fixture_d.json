@@ -1,0 +1,226 @@
+{
+  "created_at": "1970-01-01T00:00:00Z",
+  "episode_id": null,
+  "metadata": {},
+  "producer": {
+    "component": "ShotListAdapter",
+    "repo": "world-engine"
+  },
+  "schema_id": "ShotList",
+  "schema_version": "0.0.1",
+  "script_id": "wave2_fixture_d",
+  "shotlist_id": "sl_749bde75a75d644d",
+  "shots": [
+    {
+      "action_beat": "Establishing shot of Market.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_scout",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": null,
+      "environment_notes": "Market, DAY",
+      "scene_id": "fd_s001",
+      "shot_id": "fd_s001_shot_000",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "Scout scans the crowd.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "PAN_LEFT",
+      "characters": [
+        {
+          "character_id": "char_scout",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.5,
+      "emotional_tag": null,
+      "environment_notes": "Market, DAY",
+      "scene_id": "fd_s001",
+      "shot_id": "fd_s001_shot_001",
+      "shot_template_id": "tpl_action"
+    },
+    {
+      "action_beat": "Establishing shot of Throne Room.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        },
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 3.0,
+      "emotional_tag": null,
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "fd_s002",
+      "shot_id": "fd_s002_shot_002",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "char_lena speaks.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": "char_lena",
+        "vo_text": "I bring news from the frontier."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.9,
+      "emotional_tag": null,
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "fd_s002",
+      "shot_id": "fd_s002_shot_003",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Reaction shot.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "fd_s002",
+      "shot_id": "fd_s002_shot_004",
+      "shot_template_id": "tpl_reaction"
+    },
+    {
+      "action_beat": "char_king speaks.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": "char_king",
+        "vo_text": "Speak."
+      },
+      "camera_framing": "MEDIUM",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_king",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "fd_s002",
+      "shot_id": "fd_s002_shot_005",
+      "shot_template_id": "tpl_dialogue"
+    },
+    {
+      "action_beat": "Reaction shot.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "STATIC",
+      "characters": [
+        {
+          "character_id": "char_lena",
+          "expression": null,
+          "pose": null
+        }
+      ],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Throne Room, INTERIOR",
+      "scene_id": "fd_s002",
+      "shot_id": "fd_s002_shot_006",
+      "shot_template_id": "tpl_reaction"
+    },
+    {
+      "action_beat": "Establishing shot of Castle Courtyard.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [],
+      "duration_sec": 3.0,
+      "emotional_tag": null,
+      "environment_notes": "Castle Courtyard, DUSK",
+      "scene_id": "fd_s003",
+      "shot_id": "fd_s003_shot_007",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "Cutaway detail.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "SLOW_ZOOM_IN",
+      "characters": [],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Castle Courtyard, DUSK",
+      "scene_id": "fd_s003",
+      "shot_id": "fd_s003_shot_008",
+      "shot_template_id": "tpl_cutaway"
+    }
+  ],
+  "timing_lock_hash": "2995fc0b52d9b3e339a1a6217f2d6692aa6376e7b74e904c28863ad02c02b85c",
+  "total_duration_sec": 22.4
+}

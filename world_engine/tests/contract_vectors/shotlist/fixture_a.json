@@ -1,0 +1,53 @@
+{
+  "created_at": "1970-01-01T00:00:00Z",
+  "episode_id": null,
+  "metadata": {},
+  "producer": {
+    "component": "ShotListAdapter",
+    "repo": "world-engine"
+  },
+  "schema_id": "ShotList",
+  "schema_version": "0.0.1",
+  "script_id": "fixture_a",
+  "shotlist_id": "sl_aad04306682bcfdb",
+  "shots": [
+    {
+      "action_beat": "Establishing shot of Empty Plain.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "WIDE",
+      "camera_movement": "STATIC",
+      "characters": [],
+      "duration_sec": 3.0,
+      "emotional_tag": null,
+      "environment_notes": "Empty Plain, DAY",
+      "scene_id": "fa_s001",
+      "shot_id": "fa_s001_shot_000",
+      "shot_template_id": "tpl_establishing"
+    },
+    {
+      "action_beat": "Cutaway detail.",
+      "audio_intent": {
+        "music_mood": null,
+        "sfx_tags": [],
+        "vo_speaker_id": null,
+        "vo_text": null
+      },
+      "camera_framing": "CLOSE_UP",
+      "camera_movement": "SLOW_ZOOM_IN",
+      "characters": [],
+      "duration_sec": 2.0,
+      "emotional_tag": null,
+      "environment_notes": "Empty Plain, DAY",
+      "scene_id": "fa_s001",
+      "shot_id": "fa_s001_shot_001",
+      "shot_template_id": "tpl_cutaway"
+    }
+  ],
+  "timing_lock_hash": "95f20effe5e29136471761ce4998918596d5908858545ece2768d6dafbb7611b",
+  "total_duration_sec": 5.0
+}

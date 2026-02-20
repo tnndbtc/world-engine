@@ -34,6 +34,16 @@ def dump_shotlist(shotlist: ShotList, *, indent: int = 2) -> str:
     return json.dumps(raw, sort_keys=True, indent=indent, ensure_ascii=False)
 
 
+def canonical_json_bytes(shotlist: ShotList) -> bytes:
+    """Return canonical UTF-8 bytes for a ShotList (sort_keys=True, indent=2).
+
+    Used by vector verification tests to produce a byte-stable artifact.
+    Identical algorithm to dump_shotlist() but returns bytes, not str.
+    """
+    raw = json.loads(shotlist.model_dump_json())
+    return json.dumps(raw, sort_keys=True, indent=2, ensure_ascii=False).encode("utf-8")
+
+
 def validate_shotlist(data: dict) -> List[str]:
     """Validate a raw dict against the ShotList schema.
 
