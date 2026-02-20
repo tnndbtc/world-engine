@@ -2,7 +2,7 @@
 
 Public entry point
 ------------------
-    adapt_script(script, created_at=None) -> ShotList
+    adapt_script(script, created_at=...) -> ShotList
 
 All sub-stages are pure functions.  No file I/O, no external state, no
 randomness.
@@ -12,12 +12,12 @@ Determinism guarantees
 - shot_id     — f"{scene_id}_shot_{global_index:03d}", zero-padded, monotonic
 - shotlist_id — "sl_" + SHA-256(script_id)[:16]
 - durations   — word-count formula with fixed constants; round(x, 3)
-- created_at  — caller-supplied; adapter never reads the system clock
+- created_at  — always caller-supplied or the fixed epoch constant below;
+                the adapter NEVER reads the system clock
 """
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 
 from world_engine.adaptation.emotional_tagger import (
@@ -41,25 +41,29 @@ from world_engine.adaptation.timing import compute_timing_lock_hash, estimate_sh
 # ── Public API ────────────────────────────────────────────────────────────────
 
 
+# Deterministic epoch default — used when the caller does not supply created_at.
+# This constant ensures adapt_script() is fully pure even when called without
+# arguments; the system clock is never consulted.
+_DEFAULT_CREATED_AT: str = "1970-01-01T00:00:00Z"
+
+
 def adapt_script(
     script: Script,
-    created_at: Optional[str] = None,
+    created_at: str = _DEFAULT_CREATED_AT,
 ) -> ShotList:
     """Convert a validated Script into a ShotList with timing_lock_hash.
 
     Args:
         script:     A validated Script model (§5.5).
         created_at: ISO 8601 datetime string stamped on the ShotList artifact.
-                    If None, the current UTC time is used.  Pass a fixed value
-                    in tests to guarantee byte-identical output.
+                    Defaults to "1970-01-01T00:00:00Z".  The adapter NEVER
+                    reads the system clock; callers that need a real timestamp
+                    must supply it explicitly.
 
     Returns:
         A ShotList (§5.6) where every shot has duration_sec > 0 and the
         timing_lock_hash covers shot ordering and all durations.
     """
-    if created_at is None:
-        created_at = datetime.now(timezone.utc).isoformat()
-
     shots = _build_shots(script)
     total = round(sum(s.duration_sec for s in shots), 3)
     timing_hash = compute_timing_lock_hash(shots)

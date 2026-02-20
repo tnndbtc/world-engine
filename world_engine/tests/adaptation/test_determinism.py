@@ -60,6 +60,24 @@ def _example_script() -> Script:
 
 
 class TestConsistency:
+    def test_default_created_at_is_deterministic(self):
+        """adapt_script() with no created_at must never read the system clock.
+
+        The default must be a fixed constant, so calling adapt_script() twice
+        without arguments on the same Script yields bit-identical ShotLists.
+        """
+        script = _example_script()
+        sl_a = adapt_script(script)
+        sl_b = adapt_script(script)
+        assert sl_a.created_at == sl_b.created_at
+        assert sl_a == sl_b
+
+    def test_default_created_at_value(self):
+        """The epoch constant is the agreed deterministic default."""
+        script = _example_script()
+        sl = adapt_script(script)
+        assert sl.created_at == "1970-01-01T00:00:00Z"
+
     def test_same_input_same_output(self):
         script = _example_script()
         sl_a = adapt_script(script, created_at=FIXED_AT)
