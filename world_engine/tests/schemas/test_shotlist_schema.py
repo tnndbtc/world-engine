@@ -145,6 +145,27 @@ class TestJsonSchemaContract:
         with pytest.raises(jsonschema.ValidationError):
             jsonschema.validate(bad, self._schema())
 
+    def test_missing_schema_id_rejected(self):
+        """schema_id is now required — artifact without it must fail JSON Schema."""
+        data = json.loads(_minimal_shotlist().model_dump_json())
+        del data["schema_id"]
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(data, self._schema())
+
+    def test_missing_producer_rejected(self):
+        """producer is now required — artifact without it must fail JSON Schema."""
+        data = json.loads(_minimal_shotlist().model_dump_json())
+        del data["producer"]
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(data, self._schema())
+
+    def test_producer_missing_required_fields_rejected(self):
+        """producer with neither repo nor component must fail JSON Schema."""
+        data = json.loads(_minimal_shotlist().model_dump_json())
+        data["producer"] = {}
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(data, self._schema())
+
     def test_extra_root_field_rejected(self):
         """additionalProperties:false must reject unknown top-level keys."""
         data = json.loads(_minimal_shotlist().model_dump_json())
