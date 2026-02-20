@@ -9,6 +9,8 @@ Covers:
 """
 from __future__ import annotations
 
+import types
+
 import pytest
 
 from world_engine.adaptation.models import AudioIntent, Shot, ShotList
@@ -201,3 +203,61 @@ class TestCanonDecisionDeny:
         result = evaluate_shotlist(sl)
         assert result.decision == "allow"
         assert result.reasons == []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Token-boundary and edge-case tests
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestCanonDecisionTokenBoundary:
+    """Token-boundary and edge-case tests for evaluate_shotlist."""
+
+    def test_not_forbidden_does_not_trigger_deny(self):
+        """'NOT_FORBIDDEN' must NOT trigger deny (word-boundary check)."""
+        shot = Shot(
+            shot_id="s001_shot_050",
+            scene_id="s001",
+            duration_sec=2.0,
+            action_beat="this is NOT_FORBIDDEN content",
+            camera_framing="WIDE",
+            camera_movement="STATIC",
+            audio_intent=AudioIntent(),
+        )
+        sl = _minimal_shotlist(shots=[shot])
+        result = evaluate_shotlist(sl)
+        assert result.decision == "allow"
+        assert result.reasons == []
+
+    def test_nested_camera_forbidden_triggers_deny(self):
+        """FORBIDDEN in a nested shot.camera.framing_hint must trigger deny."""
+        # duck-typed shot — mimics a future Shot variant with nested camera
+        camera = types.SimpleNamespace(framing_hint="FORBIDDEN angle", movement="STATIC")
+        audio = types.SimpleNamespace(vo_text=None, vo_speaker_id=None)
+        shot = types.SimpleNamespace(
+            shot_id="s001_shot_051",
+            audio_intent=audio,
+            camera=camera,
+            # no flat text fields
+        )
+        # wrap in a minimal duck-typed ShotList
+        sl = types.SimpleNamespace(
+            shots=[shot],
+            timing_lock_hash="c" * 64,
+        )
+        result = evaluate_shotlist(sl)
+        assert result.decision == "deny"
+        assert any("FORBIDDEN" in r for r in result.reasons)
+
+    def test_missing_audio_intent_does_not_crash(self):
+        """A duck-typed shot with no audio_intent attribute must not raise."""
+        shot = types.SimpleNamespace(
+            shot_id="s001_shot_052",
+            action_beat="normal content",
+            # no audio_intent attribute at all
+        )
+        sl = types.SimpleNamespace(
+            shots=[shot],
+            timing_lock_hash="d" * 64,
+        )
+        result = evaluate_shotlist(sl)
+        assert result.decision == "allow"
