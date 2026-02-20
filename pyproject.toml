@@ -18,6 +18,9 @@ dev = [
     "jsonschema>=4.0",
 ]
 
+[project.scripts]
+world-engine = "world_engine.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["world_engine*"]
