@@ -1,6 +1,6 @@
 """Script and ShotList data models — the canonical data contracts for Workstream B.
 
-schema_version "1.0.0" is embedded in both top-level models so every artifact
+schema_version "0.0.1" is embedded in both top-level models so every artifact
 is self-describing (§30.1).  extra="ignore" on all models gives forward-
 compatibility: unknown fields from future schema versions are silently dropped
 rather than rejected (§30.2).
@@ -118,7 +118,12 @@ class ShotList(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    schema_version: str = "1.0.0"
+    schema_id: str = "ShotList"
+    schema_version: str = "0.0.1"
+    producer: Dict[str, str] = {
+        "repo": "world-engine",
+        "component": "ShotListAdapter",
+    }
     shotlist_id: str
     script_id: str
     episode_id: Optional[str] = None

@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from world_engine.adaptation.models import ShotList
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "0.0.1"
 
 
 def load_shotlist(source: Union[str, bytes, dict, Path]) -> ShotList:

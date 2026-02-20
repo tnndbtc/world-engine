@@ -70,7 +70,9 @@ def adapt_script(
     shotlist_id = _make_shotlist_id(script.script_id)
 
     return ShotList(
-        schema_version="1.0.0",
+        schema_id="ShotList",
+        schema_version="0.0.1",
+        producer={"repo": "world-engine", "component": "ShotListAdapter"},
         shotlist_id=shotlist_id,
         script_id=script.script_id,
         episode_id=script.episode_id,

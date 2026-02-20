@@ -1,14 +1,24 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ShotList",
-  "description": "Film-ready shot breakdown produced by the World Engine adapter. Schema version 1.0.0.",
+  "description": "Film-ready shot breakdown produced by the World Engine adapter. Schema version 0.0.1.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["created_at", "script_id", "shotlist_id", "shots", "timing_lock_hash", "total_duration_sec"],
+  "required": ["created_at", "producer", "schema_id", "script_id", "shotlist_id", "shots", "timing_lock_hash", "total_duration_sec"],
   "properties": {
     "created_at":         { "type": "string" },
     "episode_id":         { "type": ["string", "null"] },
     "metadata":           { "type": "object" },
+    "producer": {
+      "type": "object",
+      "required": ["component", "repo"],
+      "properties": {
+        "component": { "type": "string" },
+        "repo":      { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "schema_id":          { "type": "string" },
     "schema_version":     { "type": "string" },
     "script_id":          { "type": "string" },
     "shotlist_id":        { "type": "string" },

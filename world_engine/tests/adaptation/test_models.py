@@ -82,7 +82,7 @@ class TestRoundtrip:
 
     def test_shotlist_schema_version_in_json(self):
         data = json.loads(_minimal_shotlist().model_dump_json())
-        assert data["schema_version"] == "1.0.0"
+        assert data["schema_version"] == "0.0.1"
 
     def test_shot_roundtrip(self):
         shot = _minimal_shot()
