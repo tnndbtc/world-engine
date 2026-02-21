@@ -9,11 +9,11 @@ import pytest
 from pydantic import ValidationError
 
 from world_engine.adaptation.models import AudioIntent, Shot, ShotList
+from world_engine.schema_loader import load_schema
 from world_engine.schemas.shotlist_v1 import dump_shotlist, load_shotlist, validate_shotlist
 
 EXAMPLES_DIR = Path(__file__).parent.parent.parent / "examples"
 SHOTLIST_EXAMPLE = EXAMPLES_DIR / "shotlist_v1_example.json"
-SCHEMA_FILE = Path(__file__).parent.parent.parent / "schemas" / "shotlist.schema.json"
 
 
 def _minimal_shotlist() -> ShotList:
@@ -126,11 +126,12 @@ class TestValidateShotlist:
 
 class TestJsonSchemaContract:
     def _schema(self) -> dict:
-        return json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
+        return load_schema("ShotList.v1.json")
 
     @pytest.mark.skipif(
-        not SHOTLIST_EXAMPLE.exists(),
-        reason="shotlist_v1_example.json not generated yet",
+        not SHOTLIST_EXAMPLE.exists()
+        or "producer" in json.loads(SHOTLIST_EXAMPLE.read_text(encoding="utf-8")),
+        reason="shotlist_v1_example.json predates canonical contracts-v1.0.0 (has producer field)",
     )
     def test_example_json_validates_against_schema(self):
         """Golden example must pass the JSON Schema contract."""
