@@ -37,7 +37,6 @@ from world_engine.adaptation.models import (
 )
 from world_engine.adaptation.shot_templates import SHOT_TEMPLATES
 from world_engine.adaptation.timing import compute_timing_lock_hash, estimate_shot_duration
-from world_engine.contract_validate import validate_shotlist_model
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -89,6 +88,9 @@ def adapt_script(
         timing_lock_hash=timing_hash,
         created_at=created_at,
     )
+    # Local import avoids a circular import via adaptation/__init__.py → adapter
+    # → contract_validate → shotlist_v1 → adaptation.models → __init__.py.
+    from world_engine.contract_validate import validate_shotlist_model  # noqa: PLC0415
     validate_shotlist_model(shotlist)
     return shotlist
 
