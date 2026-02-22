@@ -4,7 +4,7 @@ Produced by CanonGate: evaluates a ShotList and emits a decision artifact.
 Default decision is "allow". A shot whose text fields contain the literal
 token "FORBIDDEN" triggers a "deny" decision (Wave-1). The double-underscore
 form "__FORBIDDEN__" triggers "deny" with reasons == ["FORBIDDEN_TOKEN"] (Wave-4:
-now loaded from policies/v0/forbidden_tokens.json rather than a compiled regex).
+now loaded from third_party/contracts/compat/forbidden_tokens.json rather than a compiled regex).
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ class CanonDecision(BaseModel):
 
 _FORBIDDEN_RE = re.compile(r'\bFORBIDDEN\b')
 
-_POLICY_FILE = _pathlib.Path(__file__).parent.parent / "policies" / "v0" / "forbidden_tokens.json"
+_POLICY_FILE = _pathlib.Path(__file__).parent.parent / "third_party" / "contracts" / "compat" / "forbidden_tokens.json"
 
 
 #def _load_policy_tokens(path: _pathlib.Path) -> frozenset:

@@ -11,6 +11,7 @@ from world_engine.adaptation.adapter import adapt_script
 from world_engine.adaptation.models import (
     DialogueLine, Scene, SceneAction, Script, ShotList,
 )
+from world_engine.contract_validate import validate_shotlist as _validate_canonical
 from world_engine.schemas.shotlist_v1 import canonical_json_bytes
 
 # ── CanonGate — canon/ is at repo root; importable via editable install path ──
@@ -63,7 +64,12 @@ def _script_fixture_d() -> Script:
 # ── Pipeline runners ──────────────────────────────────────────────────────────
 
 def _run_shotlist_vectors() -> Dict[str, bytes]:
-    """Run 3 ShotList contract vectors → {key: produced_bytes}."""
+    """Run 3 ShotList contract vectors → {key: produced_bytes}.
+
+    Each produced ShotList is validated against
+    third_party/contracts/schemas/ShotList.v1.json before being returned.
+    Raises FileNotFoundError if the canonical schema is absent.
+    """
     results: Dict[str, bytes] = {}
     for name, factory in [
         ("shotlist/fixture_a", _script_fixture_a),
@@ -71,7 +77,13 @@ def _run_shotlist_vectors() -> Dict[str, bytes]:
         ("shotlist/fixture_d", _script_fixture_d),
     ]:
         sl = adapt_script(factory())
-        results[name] = canonical_json_bytes(sl)
+        produced = canonical_json_bytes(sl)
+        # Project to canonical v1.0.0 format before validation
+        raw = json.loads(produced.decode("utf-8"))
+        canonical = {k: v for k, v in raw.items() if k not in ("producer", "schema_id")}
+        canonical["schema_version"] = "1.0.0"
+        _validate_canonical(canonical)  # raises FileNotFoundError if contracts missing
+        results[name] = produced
     return results
 
 
@@ -119,5 +131,8 @@ def run_verify() -> bool:
         run1 = {**_run_shotlist_vectors(), **_run_canongate_vectors()}
         run2 = {**_run_shotlist_vectors(), **_run_canongate_vectors()}
         return _check_against_goldens(run1) and (run1 == run2)
+    except FileNotFoundError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return False
     except Exception:
         return False
