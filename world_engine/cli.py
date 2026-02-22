@@ -19,6 +19,14 @@ def main() -> None:
         "--script", required=True, metavar="script.json",
         help="Path to a Script JSON file",
     )
+    validate_shotlist_parser = sub.add_parser(
+        "validate-shotlist",
+        help="Validate an existing ShotList JSON file against the canonical contract",
+    )
+    validate_shotlist_parser.add_argument(
+        "--shotlist", required=True, metavar="shotlist.json",
+        help="Path to a ShotList JSON file",
+    )
     produce_parser = sub.add_parser(
         "produce-shotlist",
         help="Adapt a Script JSON → validated canonical ShotList JSON",
@@ -52,6 +60,18 @@ def main() -> None:
             print("ERROR: invalid Script")
             sys.exit(1)
         sys.exit(0)
+    elif args.command == "validate-shotlist":
+        import jsonschema
+        try:
+            validate_shotlist_file(Path(args.shotlist))
+        except jsonschema.ValidationError as exc:
+            print(f"ERROR: invalid ShotList — {exc.message}")
+            sys.exit(1)
+        except Exception as exc:
+            print(f"ERROR: {exc}")
+            sys.exit(1)
+        print("OK: ShotList is valid")
+        sys.exit(0)
     elif args.command == "produce-shotlist":
         produce_shotlist(Path(args.script), Path(args.output))
     else:
@@ -59,19 +79,91 @@ def main() -> None:
         sys.exit(1)
 
 
+def validate_shotlist_file(shotlist_path: Path) -> None:
+    """Load a ShotList JSON file and validate it against the canonical contract.
+
+    Raises ``jsonschema.ValidationError`` if the file does not conform to
+    ``third_party/contracts/schemas/ShotList.v1.json``.
+    """
+    from world_engine.contract_validate import validate_shotlist
+
+    data = json.loads(shotlist_path.read_text(encoding="utf-8"))
+    validate_shotlist(data)
+
+
+def _contract_to_internal(data: dict) -> dict:
+    """Map canonical Script.v1.json structure to internal Pydantic Script format.
+
+    The canonical contract uses a flat ``actions`` array with typed items::
+
+        {"type": "dialogue", "character": "X", "text": "..."  }
+        {"type": "action",   "text": "..."                     }
+
+    Field-name variants accepted: ``character`` or ``speaker`` for the
+    speaker ID; ``text`` or ``line`` for content.
+
+    The internal model uses separate ``dialogue`` and ``actions`` lists, and
+    requires ``created_at`` (which the contract makes optional).
+    """
+    internal_scenes = []
+    for scene in data.get("scenes", []):
+        dialogue: list = []
+        actions: list = []
+        characters: list = []
+        for item in scene.get("actions", []):
+            text = item.get("text") or item.get("line", "")
+            if item.get("type") == "dialogue":
+                speaker = item.get("character") or item.get("speaker", "")
+                dialogue.append({"speaker_id": speaker, "text": text})
+                if speaker and speaker not in characters:
+                    characters.append(speaker)
+            else:
+                actions.append({
+                    "description": text,
+                    "characters": item.get("characters", []),
+                })
+        internal_scenes.append({
+            "scene_id": scene["scene_id"],
+            "location": scene["location"],
+            "time_of_day": scene["time_of_day"],
+            "characters": characters,
+            "dialogue": dialogue,
+            "actions": actions,
+        })
+    return {
+        "script_id": data["script_id"],
+        "title": data["title"],
+        # created_at is optional in the contract; internal model requires it
+        "created_at": data.get("created_at", "1970-01-01T00:00:00Z"),
+        "episode_id": data.get("episode_id"),
+        "scenes": internal_scenes,
+    }
+
+
 def produce_shotlist(script_path: Path, output_path: Path) -> None:
     """Adapt script → canonical ShotList, validate against contracts, write file.
 
-    Raises jsonschema.ValidationError if the produced artifact does not conform
-    to third_party/contracts/schemas/ShotList.v1.json.  The output file is
-    never written when validation fails.
+    Raises ``jsonschema.ValidationError`` if:
+    - the input Script.json does not conform to ``Script.v1.json``, or
+    - the produced ShotList does not conform to ``ShotList.v1.json``.
+
+    The output file is never written when validation fails.
     """
+    import jsonschema  # noqa: PLC0415
     from world_engine.adaptation.adapter import adapt_script
     from world_engine.adaptation.models import Script
     from world_engine.contract_validate import validate_shotlist
+    from world_engine.schema_loader import load_schema
     from world_engine.schemas.shotlist_v1 import canonical_json_bytes
 
-    script = Script.model_validate(json.loads(script_path.read_text(encoding="utf-8")))
+    raw_data = json.loads(script_path.read_text(encoding="utf-8"))
+
+    # Bug 1 fix: validate input against canonical Script.v1.json BEFORE Pydantic.
+    # Raises jsonschema.ValidationError on any contract violation.
+    jsonschema.validate(raw_data, load_schema("Script.v1.json"))
+
+    # Bug 2 fix: map canonical contract format → internal Pydantic format.
+    script = Script.model_validate(_contract_to_internal(raw_data))
     sl = adapt_script(script)
 
     # Project to canonical v1.0.0 format:

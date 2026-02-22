@@ -37,6 +37,7 @@ from world_engine.adaptation.models import (
 )
 from world_engine.adaptation.shot_templates import SHOT_TEMPLATES
 from world_engine.adaptation.timing import compute_timing_lock_hash, estimate_shot_duration
+from world_engine.contract_validate import validate_shotlist_model
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -76,7 +77,7 @@ def adapt_script(
     timing_hash = compute_timing_lock_hash(shots)
     shotlist_id = _make_shotlist_id(script.script_id)
 
-    return ShotList(
+    shotlist = ShotList(
         schema_id="ShotList",
         schema_version="0.0.1",
         producer={"repo": "world-engine", "component": "ShotListAdapter"},
@@ -88,6 +89,8 @@ def adapt_script(
         timing_lock_hash=timing_hash,
         created_at=created_at,
     )
+    validate_shotlist_model(shotlist)
+    return shotlist
 
 
 # ── ID helpers ────────────────────────────────────────────────────────────────
