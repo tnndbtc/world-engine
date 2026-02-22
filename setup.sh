@@ -10,6 +10,24 @@ run_tests() {
     echo "──────────────────────────────────────────────"
     python -m pytest -q
     echo "──────────────────────────────────────────────"
+    echo ""
+    echo "Smoke test — produce and validate a ShotList:"
+    echo ""
+    _ts="$(date '+%Y%m%d_%H%M%S')"
+    _out="/tmp/ShotList_${_ts}.json"
+    echo "  \$ world-engine produce-shotlist \\"
+    echo "      --script  third_party/contracts/goldens/e2e/example_episode/Script.json \\"
+    echo "      --output  ${_out}"
+    world-engine produce-shotlist \
+        --script  third_party/contracts/goldens/e2e/example_episode/Script.json \
+        --output  "${_out}"
+    echo ""
+    echo "  \$ world-engine validate-shotlist --shotlist ${_out}"
+    world-engine validate-shotlist --shotlist "${_out}"
+    rm -f "${_out}"
+    echo "  (cleaned up ${_out})"
+    echo ""
+    echo "──────────────────────────────────────────────"
     read -rp "Press ENTER to return to the menu..."
 }
 

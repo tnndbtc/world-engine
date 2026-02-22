@@ -25,6 +25,6 @@ def validate_shotlist_model(sl) -> None:
     Raises jsonschema.ValidationError if the projected artifact is non-conformant.
     """
     raw = json.loads(canonical_json_bytes(sl).decode("utf-8"))
-    canonical = {k: v for k, v in raw.items() if k not in ("producer", "schema_id")}
+    canonical = {k: v for k, v in raw.items() if k != "producer"}
     canonical["schema_version"] = "1.0.0"
     validate_shotlist(canonical)

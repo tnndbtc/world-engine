@@ -13,6 +13,7 @@ _CONTRACTS_DIR = Path(__file__).resolve().parents[2] / "third_party" / "contract
 
 
 _MINIMAL_SCRIPT = {
+    "schema_id": "Script",
     "schema_version": "1.0.0",
     "script_id": "runtime_test_script",
     "project_id": "test_project",

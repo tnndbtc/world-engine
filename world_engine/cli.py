@@ -171,7 +171,7 @@ def produce_shotlist(script_path: Path, output_path: Path) -> None:
     #     (producer, schema_id) so additionalProperties:false is satisfied
     #   • pin schema_version to the canonical constant "1.0.0"
     raw = json.loads(canonical_json_bytes(sl).decode("utf-8"))
-    canonical = {k: v for k, v in raw.items() if k not in ("producer", "schema_id")}
+    canonical = {k: v for k, v in raw.items() if k != "producer"}
     canonical["schema_version"] = "1.0.0"
 
     # Validate BEFORE writing — raises ValidationError if non-conformant
