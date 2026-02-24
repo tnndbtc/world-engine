@@ -140,6 +140,10 @@ def _contract_to_internal(data: dict) -> dict:
     }
 
 
+if __name__ == "__main__":
+    main()
+
+
 def produce_shotlist(script_path: Path, output_path: Path) -> None:
     """Adapt script → canonical ShotList, validate against contracts, write file.
 

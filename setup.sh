@@ -31,6 +31,41 @@ run_tests() {
     read -rp "Press ENTER to return to the menu..."
 }
 
+install_requirements() {
+    echo ""
+    echo "Installing requirements..."
+    echo "──────────────────────────────────────────────"
+
+    local pip_cmd
+    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+        pip_cmd="$VIRTUAL_ENV/bin/pip"
+    elif command -v pip3 &>/dev/null; then
+        pip_cmd="pip3"
+    elif command -v pip &>/dev/null; then
+        pip_cmd="pip"
+    else
+        echo "Error: pip not found. Please install Python/pip first." >&2
+        return 1
+    fi
+
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local req_file="${script_dir}/requirements.txt"
+
+    if [[ ! -f "$req_file" ]]; then
+        echo "Error: requirements.txt not found at ${req_file}" >&2
+        return 1
+    fi
+
+    echo "  \$ ${pip_cmd} install -r ${req_file}"
+    "$pip_cmd" install -r "$req_file"
+
+    echo "──────────────────────────────────────────────"
+    echo "Done. All requirements installed."
+    echo ""
+    read -rp "Press ENTER to return to the menu..."
+}
+
 show_usage() {
     echo ""
     echo "world-engine — command usage"
@@ -64,13 +99,15 @@ while true; do
     echo ""
     echo "world-engine — dev menu"
     echo "  1) Run Tests"
-    echo "  2) Show Usage"
+    echo "  2) Install requirements"
+    echo "  3) Show Usage"
     echo "  0) Exit"
     echo ""
     read -rp "Choice: " choice
     case "$choice" in
         1) run_tests ;;
-        2) show_usage ;;
+        2) install_requirements ;;
+        3) show_usage ;;
         0) echo "Bye."; exit 0 ;;
         *) echo "Unknown option: $choice" ;;
     esac

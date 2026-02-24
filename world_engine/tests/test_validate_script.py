@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -119,14 +120,26 @@ class TestValidateScriptFile:
             validate_script_file(bad)
 
 
+def _world_engine_cmd() -> list[str]:
+    """Return the command prefix to invoke the world-engine CLI.
+
+    Preference order:
+    1. ``world-engine`` binary found anywhere on PATH (normal installed use).
+    2. ``python -m world_engine.cli`` via the current interpreter (editable /
+       in-tree use, no install required).
+    """
+    exe = shutil.which("world-engine")
+    if exe:
+        return [exe]
+    return [sys.executable, "-m", "world_engine.cli"]
+
+
 class TestCLIValidateScript:
     """End-to-end CLI tests — verify exact output and exit codes."""
 
-    _EXE = "/home/tnnd/.virtualenvs/world-engine/bin/world-engine"
-
     def _run(self, *args: str):
         return subprocess.run(
-            [self._EXE, *args],
+            [*_world_engine_cmd(), *args],
             capture_output=True, text=True,
         )
 
