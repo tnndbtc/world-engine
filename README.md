@@ -7,11 +7,15 @@ It is **Stage 2** of the agent pipeline:
 ```
 writing-agent → [Script.json]
                      │
-              world-engine          ← this repo
+        world-engine validate-story-draft    ← upstream canon gate (NEW)
+                     │ canon-consistent?
+                 yes │                  no → CanonViolationReport.json → stop
+                     ▼
+        world-engine produce-shotlist
                      │
                [ShotList.json]
                      │
-              media-agent → orchestrator → video-agent
+        media-agent → orchestrator → video-agent
 ```
 
 Protocol version: `1.0.2` (see `PROTOCOL_VERSION`)
@@ -22,10 +26,12 @@ Protocol version: `1.0.2` (see `PROTOCOL_VERSION`)
 
 | Responsibility | Where |
 |---|---|
+| **Validate story draft against CanonSnapshot before compilation** | `world_engine/story_draft_validator.py` |
 | Adapt `Script.json` → `ShotList.json` (deterministic) | `world_engine/adaptation/` |
 | Validate `Script.json` against contract rules | `world_engine/validator.py` |
 | Validate `ShotList.json` against `ShotList.v1.json` schema | `world_engine/contract_validate.py` |
 | Canon Store — load/save Canon JSON snapshots | `canon/canon_io.py` |
+| **Project Canon Store — per-project snapshot + diff history (Option C)** | `canon/project_store.py` |
 | Canon Gate — block hard contradictions (name/age/alive/location) | `canon/gate.py` |
 | Canon Decision — evaluate a ShotList and emit allow/deny artifact | `canon/decision.py` |
 
@@ -50,6 +56,32 @@ pip install -r requirements.txt
 ## CLI
 
 The binary is `world-engine`. All commands exit `0` on success and `1` on failure.
+
+### `validate-story-draft` — check a Script draft against CanonSnapshot
+
+Validates a `Script.json` against a `CanonSnapshot.json` **before** compilation.
+Catches hard contradictions (dead characters appearing, name/age/location changes)
+and emits a `CanonViolationReport.json` on failure.
+
+```bash
+world-engine validate-story-draft \
+    --draft   path/to/Script.json \
+    --canon   path/to/CanonSnapshot.json \
+    --out     path/to/CanonViolationReport.json   # optional; only written on failure
+```
+
+| Exit code | Meaning |
+|---|---|
+| `0` | Draft is canon-consistent — `--out` file not written, stdout empty |
+| `1` | Violations found — `CanonViolationReport.json` printed to stdout and written to `--out` (if given) |
+
+Checks performed (Phase 0):
+- Any character appearing in the script is asserted to be `alive=True` in canon
+- Explicit character facts in the script's `characters` list (name, age, alive, location) are compared against canon
+
+The draft input is validated against `Script.v1.json` before any canon check — malformed input is rejected immediately.
+
+---
 
 ### `produce-shotlist` — adapt Script → ShotList
 
@@ -179,14 +211,61 @@ Deny triggers (in priority order):
 
 ---
 
+## Project Canon Store
+
+`canon/project_store.py` provides project-aware Canon persistence using **Option C** — current snapshot + append-only diff log.
+
+### Layout
+
+```
+<base_dir>/<project_id>/
+  CanonSnapshot.json              ← current state (always latest)
+  history/
+    0001_ep001.diff.json          ← accepted CanonDiffs, immutable once written
+    0002_ep002.diff.json
+    ...
+  violations/
+    ep003_CanonViolationReport.json
+```
+
+### API
+
+```python
+from canon.project_store import (
+    load_project_canon,
+    save_project_canon,
+    save_violation_report,
+    load_canon_at_episode,
+)
+
+# Load current state
+canon = load_project_canon("my-project", base_dir="/data/projects")
+
+# Persist an accepted diff (episode_seq supplied by orchestrator — never computed internally)
+new_canon, errors = apply_canon_diff(canon, diff)
+if not errors:
+    save_project_canon("my-project", "/data/projects", new_canon, diff,
+                       episode_id="ep002", episode_seq=2)
+
+# Replay to reconstruct state at a past episode
+past_canon = load_canon_at_episode("my-project", "/data/projects", "ep001")
+```
+
+**Sequence numbers** are always passed in by the caller (orchestrator) — world-engine never derives them from file counts, making parallel episode runs race-safe.
+
+---
+
 ## Contract schemas
 
 All JSON schemas are in `third_party/contracts/schemas/`:
 
-| Schema | Purpose |
-|---|---|
-| `Script.v1.json` | Input to `produce-shotlist` and `validate-script` |
-| `ShotList.v1.json` | Output of `produce-shotlist`; input to `validate-shotlist` |
+| Schema | Purpose | Authored in |
+|---|---|---|
+| `Script.v1.json` | Input to `produce-shotlist`, `validate-script`, `validate-story-draft` | orchestrator |
+| `ShotList.v1.json` | Output of `produce-shotlist`; input to `validate-shotlist` | orchestrator |
+| `CanonViolationReport.v1.json` | Output of `validate-story-draft` on failure | orchestrator |
+
+All schemas are synced from `orchestrator/contracts/schemas/` into `third_party/contracts/schemas/` — world-engine never authors schemas directly.
 
 ---
 
@@ -215,4 +294,4 @@ python -m pytest canon/tests/ -v
 python -m pytest world_engine/tests/ -v
 ```
 
-Current test count: **222 passed, 1 skipped**.
+Current test count: **269 passed, 1 skipped**.

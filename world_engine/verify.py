@@ -80,7 +80,7 @@ def _run_shotlist_vectors() -> Dict[str, bytes]:
         produced = canonical_json_bytes(sl)
         # Project to canonical v1.0.0 format before validation
         raw = json.loads(produced.decode("utf-8"))
-        canonical = {k: v for k, v in raw.items() if k not in ("producer", "schema_id")}
+        canonical = {k: v for k, v in raw.items() if k != "producer"}
         canonical["schema_version"] = "1.0.0"
         _validate_canonical(canonical)  # raises FileNotFoundError if contracts missing
         results[name] = produced

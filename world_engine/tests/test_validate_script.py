@@ -25,6 +25,25 @@ _VALID = {
     ],
 }
 
+# Canonical Script.v1.json format (used by CLI validate-script and produce-shotlist)
+_VALID_CANONICAL = {
+    "schema_id": "Script",
+    "schema_version": "1.0.0",
+    "script_id": "s001",
+    "project_id": "proj1",
+    "title": "Test Script",
+    "scenes": [
+        {
+            "scene_id": "sc001",
+            "location": "INT. HALL",
+            "time_of_day": "DAY",
+            "actions": [
+                {"type": "action", "text": "A figure enters."},
+            ],
+        }
+    ],
+}
+
 
 @pytest.fixture
 def valid_script_path(tmp_path: Path) -> Path:
@@ -143,8 +162,10 @@ class TestCLIValidateScript:
             capture_output=True, text=True,
         )
 
-    def test_cli_valid_script_exits_0(self, valid_script_path: Path):
-        r = self._run("validate-script", "--script", str(valid_script_path))
+    def test_cli_valid_script_exits_0(self, tmp_path: Path):
+        p = tmp_path / "script_canonical.json"
+        p.write_text(json.dumps(_VALID_CANONICAL), encoding="utf-8")
+        r = self._run("validate-script", "--script", str(p))
         assert r.returncode == 0
 
     def test_cli_invalid_script_exits_1_exact_message(self, tmp_path: Path):

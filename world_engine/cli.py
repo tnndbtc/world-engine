@@ -39,6 +39,22 @@ def main() -> None:
         "--output", required=True, metavar="shotlist.json",
         help="Destination path for the canonical ShotList JSON",
     )
+    draft_parser = sub.add_parser(
+        "validate-story-draft",
+        help="Validate a Script JSON draft against a CanonSnapshot before compilation",
+    )
+    draft_parser.add_argument(
+        "--draft", required=True, metavar="Script.json",
+        help="Path to a Script JSON file to validate",
+    )
+    draft_parser.add_argument(
+        "--canon", required=True, metavar="CanonSnapshot.json",
+        help="Path to the current CanonSnapshot JSON file",
+    )
+    draft_parser.add_argument(
+        "--out", required=False, metavar="CanonViolationReport.json",
+        help="Optional path to write CanonViolationReport.json (only written on failure)",
+    )
     args = parser.parse_args()
 
     if args.command == "verify":
@@ -50,13 +66,16 @@ def main() -> None:
             print("ERROR: world-engine verification failed")
             sys.exit(1)
     elif args.command == "validate-script":
-        from world_engine.validator import validate_script_file
-        try:
-            errors = validate_script_file(Path(args.script))
-        except (ValueError, Exception):
+        import jsonschema
+        from world_engine.schema_loader import load_schema
+        script_path = Path(args.script)
+        if not script_path.exists():
             print("ERROR: invalid Script")
             sys.exit(1)
-        if errors:
+        try:
+            data = json.loads(script_path.read_text(encoding="utf-8"))
+            jsonschema.validate(data, load_schema("Script.v1.json"))
+        except (json.JSONDecodeError, jsonschema.ValidationError, Exception):
             print("ERROR: invalid Script")
             sys.exit(1)
         sys.exit(0)
@@ -74,6 +93,8 @@ def main() -> None:
         sys.exit(0)
     elif args.command == "produce-shotlist":
         produce_shotlist(Path(args.script), Path(args.output))
+    elif args.command == "validate-story-draft":
+        _run_validate_story_draft(args)
     else:
         parser.print_help()
         sys.exit(1)
@@ -140,8 +161,78 @@ def _contract_to_internal(data: dict) -> dict:
     }
 
 
-if __name__ == "__main__":
-    main()
+def _run_validate_story_draft(args) -> None:
+    """Handler for the validate-story-draft subcommand."""
+    import jsonschema  # noqa: PLC0415
+
+    from canon.canon_io import load_canon                          # noqa: PLC0415
+    from world_engine.schema_loader import load_schema             # noqa: PLC0415
+    from world_engine.story_draft_validator import validate_story_draft  # noqa: PLC0415
+
+    draft_path = Path(args.draft)
+    canon_path = Path(args.canon)
+
+    # --- load and schema-validate the draft --------------------------------
+    if not draft_path.exists():
+        print(f"ERROR: draft file not found: {draft_path}")
+        sys.exit(1)
+
+    try:
+        draft = json.loads(draft_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"ERROR: invalid JSON in draft: {exc}")
+        sys.exit(1)
+
+    try:
+        jsonschema.validate(draft, load_schema("Script.v1.json"))
+    except jsonschema.ValidationError as exc:
+        print(f"ERROR: draft does not conform to Script.v1.json — {exc.message}")
+        sys.exit(1)
+
+    # --- load canon --------------------------------------------------------
+    if not canon_path.exists():
+        print(f"ERROR: canon file not found: {canon_path}")
+        sys.exit(1)
+
+    try:
+        canon = load_canon(str(canon_path))
+    except json.JSONDecodeError as exc:
+        print(f"ERROR: invalid JSON in canon: {exc}")
+        sys.exit(1)
+
+    # --- validate ----------------------------------------------------------
+    violations = validate_story_draft(draft, canon)
+
+    if not violations:
+        sys.exit(0)
+
+    # --- violations found --------------------------------------------------
+    project_id = draft.get("project_id", "unknown")
+    episode_id = draft.get("script_id", "unknown")
+
+    report = {
+        "schema_id":      "CanonViolationReport",
+        "schema_version": "1.0.0",
+        "project_id":     project_id,
+        "episode_id":     episode_id,
+        "violations":     violations,
+    }
+
+    # validate report against its own schema before writing
+    try:
+        jsonschema.validate(report, load_schema("CanonViolationReport.v1.json"))
+    except jsonschema.ValidationError:
+        pass  # schema mismatch is a bug, not user error — still emit the report
+
+    report_json = json.dumps(report, sort_keys=True, indent=2, ensure_ascii=False)
+    print(report_json)
+
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report_json + "\n", encoding="utf-8")
+
+    sys.exit(1)
 
 
 def produce_shotlist(script_path: Path, output_path: Path) -> None:
@@ -185,3 +276,7 @@ def produce_shotlist(script_path: Path, output_path: Path) -> None:
         json.dumps(canonical, sort_keys=True, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
+
+
+if __name__ == "__main__":
+    main()

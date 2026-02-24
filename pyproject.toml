@@ -23,7 +23,7 @@ world-engine = "world_engine.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["world_engine*"]
+include = ["world_engine*", "canon*"]
 
 [tool.pytest.ini_options]
 testpaths = ["world_engine/tests", "canon/tests", "tests"]
